@@ -12,13 +12,14 @@ void increment() {
 		std::cout << count << std::endl;
 		pthread_mutex_unlock(&mutex);
 	}
-	// ThreadPool::get_instance()->shutdown();
+	ThreadPool::get_instance()->shutdown();
 }
 
 int main() {
 	ThreadPool *pool = ThreadPool::get_instance();
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 2; ++i)
 		pool->submit(new Task(increment));
 	pool->wait_for_stop();
+	pool->join_all();
 	return 0;
 }
