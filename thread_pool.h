@@ -120,7 +120,7 @@ private:
 	};
 
 public:
-	// all public methods are thread-safe
+	// All public methods are thread-safe
 
 	static ThreadPool* get_instance() {
 		static ThreadPool pool(NUM_CPU_CORES);
@@ -128,14 +128,14 @@ public:
 	}
 
 
-	// submit a task to the thread pool. if the pool is shutdown, noop
+	// Submit a task to the thread pool. if the pool is shutdown, noop
 	//    usage: submit(new Task(...))
-	//    return: true on success, false on fail
+	//    returns: true on success, false on fail
 	bool submit(Task *task) {
 		return _task_queue.add_task(task);
 	}
 
-	// shutdown the thread pool. after the pool is shutdown, it can't
+	// Shutdown the thread pool. after the pool is shutdown, it can't
 	// accept any tasks and no tasks will be executed except the running 
 	// ones.
 	void shutdown() {
@@ -145,16 +145,18 @@ public:
 	bool is_shutdown() {
 		return _task_queue.closed();
 	}
-
+	
+	// Wait all threads to terminate. 
 	void join_all() {
 		for (int i = 0; i < _nthreads; ++i)
 			pthread_join(_threads[i], NULL);
 	}
-
+	
+	// Wait until some other thread calls shutdown()
 	void wait_for_stop() {
 		while (!_task_queue.closed()) {
 			// relinquish the processor for other threads to run
-			sleep(1);	
+			sleep(1); // TODO: sleep for a shorter period of time
 		}
 	}
 
@@ -181,7 +183,7 @@ private:
 		}
 	}
 
-	pthread_t *_threads;
+	pthread_t *_threads;      
 	int _nthreads;
 	TaskQueue _task_queue;
 };
